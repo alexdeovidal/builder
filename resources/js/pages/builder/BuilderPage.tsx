@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 import Header from '@/components/builder/Header';
@@ -18,10 +18,30 @@ interface ProjectStructure {
 }
 
 export default function BuilderPage() {
+    const [savedProjects, setSavedProjects] = useState<string[]>([]);
     const [prompt, setPrompt] = useState('Quero um site de portfólio moderno com React e Tailwind');
     const [project, setProject] = useState<ProjectStructure | null>(null);
     const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        axios.get('/api/projects')
+            .then(res => {
+                console.log('📂 Projetos recebidos:', res.data);
+                setSavedProjects(Array.isArray(res.data.projects) ? res.data.projects : []);
+            })
+            .catch(err => console.error('Erro ao carregar projetos', err));
+    }, []);
+
+    const loadProject = async (name: string) => {
+        try {
+            const res = await axios.get(`/api/projects/${name}`);
+            setProject(res.data.project);
+            setSelectedFile(null);
+        } catch (error) {
+            console.error('Erro ao carregar projeto:', error);
+        }
+    };
 
     const generateProject = async () => {
         setLoading(true);
@@ -30,10 +50,23 @@ export default function BuilderPage() {
         try {
             const response = await axios.post('/api/builder', { prompt });
             setProject(response.data.project);
+            // Recarrega os projetos
+            const res = await axios.get('/api/projects');
+            setSavedProjects(res.data.projects ?? []);
         } catch (error) {
             console.error('Erro ao gerar projeto:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const deployToGitHub = async (name: string) => {
+        try {
+            const res = await axios.post(`/api/projects/${name}/deploy`);
+            alert(`Projeto enviado para o GitHub com sucesso!\n${res.data.repo_url}`);
+        } catch (err) {
+            console.error('Erro ao enviar para o GitHub', err);
+            alert('Erro ao enviar para o GitHub. Veja o console.');
         }
     };
 
@@ -52,6 +85,9 @@ export default function BuilderPage() {
                         setPrompt={setPrompt}
                         onGenerate={generateProject}
                         loading={loading}
+                        savedProjects={savedProjects}
+                        onSelectProject={loadProject}
+                        onDeploy={deployToGitHub} // <- ✅ novo
                     />
                 ) : (
                     <ProjectLayout

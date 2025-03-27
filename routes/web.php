@@ -14,11 +14,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::get('/chat', function () {
-    return Inertia::render('chat/index');
+    return Inertia::render('chat/ChatPage');
 })->middleware(['auth', 'verified'])->name('chat');
 
 Route::get('/builder', function () {
-    return Inertia::render('builder/index');
+    return Inertia::render('builder/BuilderPage');
 })->middleware(['auth', 'verified'])->name('builder');
 
 
