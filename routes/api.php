@@ -10,3 +10,4 @@ Route::get('/builder/projects', [BuilderController::class, 'listProjects']);
 Route::post('/projects/{name}/save', [BuilderController::class, 'save']);
 Route::get('/projects/{name}/zip', [BuilderController::class, 'downloadZip']);
 Route::get('/projects/{name}', [BuilderController::class, 'load']);
+Route::get('/projects', [BuilderController::class, 'index']);

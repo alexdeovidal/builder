@@ -10,6 +10,15 @@ use Illuminate\Support\Facades\Storage;
 use ZipArchive;
 class BuilderController extends Controller
 {
+    public function index()
+    {
+        $directories = Storage::directories('projects');
+        $projects = array_map(function ($dir) {
+            return basename($dir);
+        }, $directories);
+
+        return response()->json($projects);
+    }
     public function generate(Request $request)
     {
         $prompt = $request->input('prompt');
