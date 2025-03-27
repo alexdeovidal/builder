@@ -1,5 +1,6 @@
 import FileExplorer from './FileExplorer';
 import CodeEditor from './CodeEditor';
+import axios from 'axios';
 
 interface FileNode {
     name: string;
@@ -27,6 +28,28 @@ export default function ProjectLayout({ project, selectedFile, setSelectedFile, 
                 <h2 className="text-lg font-semibold mb-2">📁 {project.project_name}</h2>
                 <FileExplorer structure={project.structure} onSelect={setSelectedFile} />
             </aside>
+
+            <div className="flex gap-4 mt-4">
+                <button
+                    className="px-4 py-2 rounded bg-green-600 hover:bg-green-500 text-sm"
+                    onClick={async () => {
+                        await axios.post(`/api/projects/${project.project_name}/save`, {
+                            structure: project.structure,
+                        });
+                        alert('Projeto salvo!');
+                    }}
+                >
+                    💾 Salvar Projeto
+                </button>
+
+                <a
+                    className="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-500 text-sm"
+                    href={`/api/projects/${project.project_name}/zip`}
+                    target="_blank"
+                >
+                    📦 Baixar ZIP
+                </a>
+            </div>
 
             <main className="col-span-9 bg-neutral-900 rounded-xl p-4 min-h-[70vh] overflow-auto">
                 {selectedFile ? (
