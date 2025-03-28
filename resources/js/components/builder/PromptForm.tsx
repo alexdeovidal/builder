@@ -1,11 +1,16 @@
+
+interface SavedProject {
+    name: string;
+    repo_url?: string;
+}
 interface PromptFormProps {
     prompt: string;
     setPrompt: (value: string) => void;
     onGenerate: () => void;
     loading: boolean;
-    savedProjects: string[];
+    savedProjects: SavedProject[];
     onSelectProject: (name: string) => void;
-    onDeploy: (name: string) => void; // ✅ nova prop
+    onDeploy: (name: string) => void;
 }
 
 export default function PromptForm({
@@ -22,29 +27,35 @@ export default function PromptForm({
             <p className="text-neutral-400">Descreva o projeto que você quer e deixe a IA criar tudo pra você.</p>
 
             {/* LISTA DE PROJETOS */}
-            {savedProjects.length > 0 && (
-                <div className="bg-neutral-900 rounded-xl p-4 mb-4">
-                    <h2 className="text-lg font-semibold mb-2">📁 Projetos Salvos</h2>
-                    <ul className="space-y-2">
-                        {savedProjects.map((name) => (
-                            <li key={name} className="flex items-center justify-between">
-                                <button
-                                    onClick={() => onSelectProject(name)}
-                                    className="text-blue-400 hover:underline text-sm"
-                                >
-                                    📂 {name}
-                                </button>
-                                <button
-                                    onClick={() => onDeploy(name)}
-                                    className="text-green-400 hover:underline text-xs"
-                                >
-                                    Enviar para o GitHub
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
+            {savedProjects.map((project) => (
+                <li key={project.name} className="flex items-center justify-between">
+                    <button
+                        onClick={() => onSelectProject(project.name)}
+                        className="text-blue-400 hover:underline text-sm"
+                    >
+                        📂 {project.name}
+                    </button>
+
+                    {!project.repo_url ? (
+                        <button
+                            onClick={() => onDeploy(project.name)}
+                            className="text-green-400 text-xs hover:underline ml-2"
+                        >
+                            Enviar para o GitHub
+                        </button>
+                    ) : (
+                        <a
+                            href={`https://github.dev/alexdeovidal/${project.name}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-yellow-400 text-xs hover:underline ml-2"
+                        >
+                            Editar no GitHub
+                        </a>
+                    )}
+                </li>
+            ))}
+
 
             <textarea
                 className="w-full p-4 bg-neutral-900 border border-neutral-700 rounded-xl"
